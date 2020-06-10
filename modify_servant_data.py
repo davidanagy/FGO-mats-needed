@@ -1,5 +1,5 @@
 import pandas as pd
-from servants import servants
+from servants_mats import servants
 
 
 def set_mats_data(df, asc_level, skill_levels):
@@ -31,6 +31,8 @@ for servant in servants:
     if len(df2) == 0:
         print('ERROR:', servant.name)
     df2 = set_mats_data(df2, servant.ascension, servant.skills)
+    priority_column = [servant.priority] * len(df2)
+    df2.insert(2, 'Priority', priority_column)
     df_new = pd.concat([df_new, df2])
 
 df_new = df_new.reset_index(drop=True)
