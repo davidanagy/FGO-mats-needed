@@ -9,6 +9,9 @@ verify_ssl = true
 pandas = "*"
 requests = "*"
 bs4 = "*"
+dash = "*"
+dash-bootstrap-components = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
