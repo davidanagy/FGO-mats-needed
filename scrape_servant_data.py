@@ -84,7 +84,7 @@ for name in servant_names:
         df2 = scrape_servant_data(name)
         #print('SUCCESS:', url_name)
     except:
-        print('ERROR:', url_name)
+        print('ERROR:', name)
     df = pd.concat([df, df2])
 
 df = df.reset_index(drop=True)
