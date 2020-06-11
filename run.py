@@ -7,7 +7,8 @@ from dash.dependencies import Input, Output
 
 # Imports from this application
 from app import app, server
-from pages import index
+import callbacks
+from layouts import index_layout, mats_layout
 
 """
 https://dash-bootstrap-components.opensource.faculty.ai/l/components/navbar
@@ -66,7 +67,9 @@ external_stylesheets = [
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False), 
     navbar, 
-    dbc.Container(id='page-content', className='mt-4'), 
+    dbc.Container(id='page-content', className='mt-4'),
+    # Hidden Div
+    html.Div(id='servant-storage', style={'display': 'none'}, children=[]),
     html.Hr(), 
     footer
 ])
@@ -75,9 +78,9 @@ app.layout = html.Div([
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/':
-        return index.layout
-    elif pathname == '/about':
-        return about.layout
+        return index_layout
+    elif pathname == '/mats':
+        return mats_layout
     else:
         return dcc.Markdown('## Page not found')
 
