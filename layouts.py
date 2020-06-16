@@ -58,9 +58,30 @@ column2 = dbc.Col(
 index_layout = dbc.Row([column1, column2])
 
 
+with open('mat_names.txt') as f:
+    mat_names_file = f.read()
+mat_names = mat_names_file.split('\n')[:-1]
+
+table_header = [
+    html.Thead(html.Tr([html.Th('Name'), html.Th('Amount')]))
+]
+
+table_rows = []
+for name in mat_names:
+    td1 = html.Td(name)
+    td2 = dbc.Input(id=f'have-input-{name}', type='number')
+    table_rows.append(html.Tr([td1, td2]))
+
+table_body = [html.Tbody(table_rows)]
+
+table = dbc.Table(table_header + table_body, bordered=True)
+
 column3 = dbc.Col(
     [
-        html.Div(id='servant-display-2')
+        table,
+        dcc.Link(dbc.Button('Click here when finished',
+                            id='get-final-table', n_clicks=0, color='primary'),
+                 href='/mats-needed-table')
     ]
 )
 
