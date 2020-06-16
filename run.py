@@ -85,5 +85,15 @@ def display_page(pathname):
     else:
         return dcc.Markdown('## Page not found')
 
+
+#https://community.plotly.com/t/allowing-users-to-download-csv-on-click/5550/3
+@app.server.route('/csv_download')
+def download_csv():
+    return send_file('user_mats_needed.csv',
+                     mimetype='text/csv',
+                     attachment_filename='your-mats-needed.csv',
+                     as_attachment=True)
+
+
 if __name__ == '__main__':
     app.run_server(debug=True)

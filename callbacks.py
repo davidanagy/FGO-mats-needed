@@ -1,10 +1,14 @@
 import dash
 import dash_bootstrap_components as dbc
+import dash_html_components as html
+import os
 import pandas as pd
+from collections import namedtuple
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 
 from app import app
+from functions import make_servants_table, calculate_mats
 
 
 all_servants = pd.read_csv('csvs/all_servants.csv')
@@ -62,14 +66,62 @@ def append_selected_servant(n_clicks, name, asc, skl1, skl2, skl3, priority, sto
     return storage, display
 
 
+with open('mat_names.txt') as f:
+    mat_names_file = f.read()
+mat_names = mat_names_file.split('\n')[:-1]
+Servant = namedtuple('Servant', ['name', 'ascension', 'skills', 'priority'])
+Material = namedtuple('Material', ['name', 'amount'])
+
+make_final_table_states = [State('servant-storage', 'data')]
+for name in mat_names:
+    states.append(State(f'have-input-{name}', 'value'))
+
+
 @app.callback(
-    Output('servant-display-2', 'children'),
-    [Input('url', 'pathname'),
-     Input('servant-storage', 'data')]
+    Output('final-table', 'children'),
+    [Input('get-final-table', 'n_clicks')],
+    make_final_table_states
 )
-def display_servants_on_mats_page(pathname, servants):
-    if pathname == '/mats':
-        s = ''
-        for servant in servants:
-            s += f'{servant}; '
-        return s
+def make_final_table(n_clicks, servant_data, *args):
+    mats = []
+    for i, name in enumerate(mat_names):
+        amount = args[i]
+        mat = Material(name, amount)
+        mats.append(mat)
+
+    servants_df = make_servants_table(servant_data)
+    df = calculate_mats(servants_df, mats)
+    cols = df.columns().tolist()
+
+    table_header = [
+        html.Thead(html.Tr([html.Th(col) for col in cols]))
+    ]
+
+    rows = []
+    for i in range(len(df)):
+        row = []
+        for col in cols:
+            row.append(html.Td(df.loc[i, col]))
+        rows.append(html.Tr(row))
+
+    table_body = [html.Tbody(rows)]
+
+    return table_header + table_body
+    # i = 0
+    # while os.path.exists(f'/user_csvs/user-csv-{i}'):
+    #     i += 1
+
+    # df.to_csv(f'/user_csvs/user_csv-{i}', index=None)
+
+
+# @app.callback(
+#     Output('servant-display-2', 'children'),
+#     [Input('url', 'pathname'),
+#      Input('servant-storage', 'data')]
+# )
+# def display_servants_on_mats_page(pathname, servants):
+#     if pathname == '/mats':
+#         s = ''
+#         for servant in servants:
+#             s += f'{servant}; '
+#         return s
