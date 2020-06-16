@@ -46,7 +46,12 @@ column1 = dbc.Col(
 
 column2 = dbc.Col(
     [
-        html.Div(id='servant-display')
+        dbc.ListGroup(id='servant-display',
+                      children=[
+                          dbc.ListGroupItem('placeholder', id='placeholder',
+                                            style={'display': 'none'}, active=False)
+                      ],
+        )
     ]
 )
 

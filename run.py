@@ -68,8 +68,9 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False), 
     navbar, 
     dbc.Container(id='page-content', className='mt-4'),
-    # Hidden Div
-    html.Div(id='servant-storage', style={'display': 'none'}, children=[]),
+    # Storage
+    dcc.Store(id='servant-storage', data=[{'name': 'placeholder', 'ascension': 0,
+                                           'skills': [0,0,0], 'priority': 0}]),
     html.Hr(), 
     footer
 ])
