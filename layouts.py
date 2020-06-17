@@ -57,6 +57,7 @@ column2 = dbc.Col(
 
 index_layout = dbc.Row([column1, column2])
 
+### Mats page layout
 
 with open('mat_names.txt') as f:
     mat_names_file = f.read()
@@ -74,15 +75,23 @@ for name in mat_names:
 
 table_body = [html.Tbody(table_rows)]
 
-table = dbc.Table(table_header + table_body, bordered=True)
+table = dbc.Table(table_header + table_body, id='mats-table', bordered=True)
 
 column3 = dbc.Col(
     [
         table,
-        dcc.Link(dbc.Button('Click here when finished',
-                            id='get-final-table', n_clicks=0, color='primary'),
-                 href='/mats-needed-table')
+        dbc.Button('Click here when finished', id='get-final-table', n_clicks=0, color='primary')
     ]
 )
 
 mats_layout = column3
+
+### Final table page layout
+
+column4 = dbc.Col(
+    [
+        dbc.Table(id='final-table', bordered=True)
+    ]
+)
+
+mats_needed_layout = column4
