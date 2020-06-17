@@ -49,18 +49,19 @@ def set_mats_data(df, asc_level, skill_levels):
 
 
 def make_servants_table(servants):
-    df = pd.read_csv('./full_servant_data/all_servants.csv')
+    df = pd.read_csv('./csvs/all_servants.csv')
     df_new = pd.DataFrame()
     for servant in servants:
-        df2 = df[df['Name'] == servant.name].reset_index(drop=True)
-        if len(df2) == 0:
-            print('ERROR:', servant.name)
+        df2 = df[df['Name'] == servant['name']]
+        df2 = df2.reset_index(drop=True)
+        # if len(df2) == 0:
+        #     print('ERROR:', servant['name'])
         df2 = set_mats_data(df2, servant['ascension'], servant['skills'])
         priority_column = [servant['priority']] * len(df2)
         df2.insert(2, 'Priority', priority_column)
         df_new = pd.concat([df_new, df2])
 
-    return df_new
+    return df_new.reset_index(drop=True)
 
 
 def calculate_mats(df, mats):
@@ -109,12 +110,15 @@ def calculate_mats(df, mats):
     mats_df['Need_Diff'] = mats_df['Need'] - mats_df['Have']
     mats_df['Want_Diff'] = mats_df['Want'] - mats_df['Have']
 
+    mats_df = mats_df.fillna(0)
+
     mats_df = mats_df.astype('int32')
 
     mats_df = mats_df.reset_index()
     mats_df = mats_df.rename(columns={'index': 'Material'})
 
     mats_df = mats_df.sort_values(by='Need_Diff', ascending=False)
+    mats_df = mats_df.reset_index(drop=True)
 
     return mats_df
 
