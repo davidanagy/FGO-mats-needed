@@ -90,8 +90,17 @@ mats_layout = column3
 
 column4 = dbc.Col(
     [
+        dcc.Link(dbc.Button('Get a CSV copy of this table',
+                            id='download-mats', n_clicks=0, color='primary'),
+                 href='/mats-csv'),
         dbc.Table(id='final-table', bordered=True)
     ]
 )
 
 mats_needed_layout = column4
+
+### Mats CSV layout
+
+column5 = dbc.Col([], id='mats-csv-text')
+
+mats_csv_layout = column5

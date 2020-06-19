@@ -119,7 +119,6 @@ def make_final_table_json(n_clicks, servant_data, pathname, *args):
 def construct_final_table(pathname, table_json):
     if pathname == '/mats-needed-table':
         df = pd.read_json(table_json)
-        print(df)
 
         cols = df.columns.tolist()
 
@@ -143,6 +142,17 @@ def construct_final_table(pathname, table_json):
 
     # df.to_csv(f'/user_csvs/user_csv-{i}', index=None)
 
+
+@app.callback(
+    Output('mats-csv-text', 'children'),
+    [Input('url', 'pathname')],
+    [State('final-table-storage', 'children')]
+)
+def make_html_csv(pathname, table):
+    if pathname == '/mats-csv':
+        # https://stackoverflow.com/questions/1776066/python-3-write-newlines-to-html
+        csv = pd.read_json(table).to_csv(index=False).split('\r\n')
+        return [html.P(line) for line in csv]
 
 # @app.callback(
 #     Output('servant-display-2', 'children'),

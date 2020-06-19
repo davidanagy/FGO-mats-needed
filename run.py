@@ -3,13 +3,16 @@ import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
+from flask import send_file
 import json
+import io
+import pandas as pd
 
 # Imports from this application
 from app import app, server
 import callbacks
-from layouts import index_layout, mats_layout, mats_needed_layout
+from layouts import index_layout, mats_layout, mats_needed_layout, mats_csv_layout
 
 """
 https://dash-bootstrap-components.opensource.faculty.ai/l/components/navbar
@@ -76,6 +79,7 @@ app.layout = html.Div([
     # Storage in a hidden div
     html.Div(id='servant-storage', children=placeholder_children, style={'display': 'none'}),
     html.Div(id='final-table-storage', style={'display': 'none'}),
+    html.Div(id='placeholder', style={'display': 'none'}),
     html.Hr(), 
     footer
 ])
@@ -89,17 +93,36 @@ def display_page(pathname):
         return mats_layout
     elif pathname == '/mats-needed-table':
         return mats_needed_layout
+    elif pathname == '/mats-csv':
+        return mats_csv_layout
     else:
         return dcc.Markdown('## Page not found')
 
 
-#https://community.plotly.com/t/allowing-users-to-download-csv-on-click/5550/3
-@app.server.route('/csv_download')
-def download_csv():
-    return send_file('user_mats_needed.csv',
-                     mimetype='text/csv',
-                     attachment_filename='your-mats-needed.csv',
-                     as_attachment=True)
+# https://community.plotly.com/t/allowing-users-to-download-csv-on-click/5550/3
+# https://community.plotly.com/t/where-to-save-temporary-file-for-user-to-download/29177/2
+# @server.route('/mats-csv-download')
+# def download_csv():
+#     print('begin download')
+#     storage = app.layout.children[4]
+#     print(getattr(storage, 'children'))
+
+#         # df = pd.read_json(table)
+
+#         # proxyIO = io.StringIO()
+#         # df.to_csv(proxyIO, index=False, encoding='utf-8')
+
+#         # mem = io.BytesIO()
+#         # mem.write(proxyIO.getvalue().encode('utf-8'))
+#         # mem.seek(0)
+
+#         # return flask.send_file(
+#         #     mem,
+#         #     mimetype='text/csv',
+#         #     attachment_filename='mats-needed.csv',
+#         #     as_attachment=True,
+#         #     cache_timeout=0
+#         # )
 
 
 if __name__ == '__main__':
