@@ -12,6 +12,7 @@ bs4 = "*"
 dash = "*"
 dash-bootstrap-components = "*"
 gunicorn = "*"
+flask = "*"
 
 [requires]
 python_version = "3.7"
