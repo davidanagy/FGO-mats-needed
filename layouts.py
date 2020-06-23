@@ -40,7 +40,7 @@ column1 = dbc.Col(
         html.Button(id='submit-servant-button', n_clicks=0, children='Select'),
         dcc.Link(dbc.Button('Click here when finished',
                             id='goto-mats', n_clicks=0, color='primary'),
-                 href='/mats')
+                 href='/mats'),
     ]
 )
 
@@ -51,6 +51,24 @@ column2 = dbc.Col(
                           dbc.ListGroupItem('placeholder', id='placeholder',
                                             style={'display': 'none'}, active=False)
                       ],
+        ),
+        dcc.Markdown('Upload a CSV from a previous sesson:'),
+        dcc.Upload(
+            id='upload-data',
+            children=html.Div([
+                'Drag and drop or ',
+                html.A('click here to select files')
+            ]),
+            style={
+                'width': '100%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px'
+            }
         )
     ]
 )
@@ -93,6 +111,9 @@ column4 = dbc.Col(
         dcc.Link(dbc.Button('Get a CSV copy of this table',
                             id='download-mats', n_clicks=0, color='primary'),
                  href='/mats-csv'),
+        dcc.Link(dbc.Button('Get a CSV copy of your servant data',
+                            id='download-servants', n_clicks=0, color='primary'),
+                 href='/servants-csv'),
         dbc.Table(id='final-table', bordered=True)
     ]
 )
@@ -108,3 +129,13 @@ column5 = dbc.Col(
 )
 
 mats_csv_layout = column5
+
+### Servants CSV layout
+
+column6 = dbc.Col(
+    [
+        html.P(id='servants-csv-text')
+    ]
+)
+
+servants_csv_layout = column6

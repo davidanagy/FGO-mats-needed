@@ -1,5 +1,6 @@
 import dash
 import dash_bootstrap_components as dbc
+# from flask_caching import Cache
 
 
 external_stylesheets = [
@@ -15,3 +16,10 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets, meta_tags=m
 app.config.suppress_callback_exceptions = True
 app.title = 'FGO Mats Needed' # appears in browser title bar
 server = app.server
+
+# https://dash.plotly.com/sharing-data-between-callbacks PART 4
+# cache = Cache(app.server, config={
+#     'CACHE_TYPE': 'filesystem',
+#     'CACHE_DIR': 'cache-directory',
+#     'CACHE_THRESHOLD': 200
+# })

@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
-from flask import send_file
+# from flask import send_file
 import json
 import io
 import pandas as pd
@@ -12,7 +12,7 @@ import pandas as pd
 # Imports from this application
 from app import app, server
 import callbacks
-from layouts import index_layout, mats_layout, mats_needed_layout, mats_csv_layout
+from layouts import index_layout, mats_layout, mats_needed_layout, mats_csv_layout, servants_csv_layout
 
 """
 https://dash-bootstrap-components.opensource.faculty.ai/l/components/navbar
@@ -70,15 +70,15 @@ external_stylesheets = [
 
 placeholder_servant = [{'name': 'placeholder', 'ascension': 0,
                         'skills': [0,0,0], 'priority': 0}]
-placeholder_children = json.dumps(placeholder_servant)
+# placeholder_children = json.dumps(placeholder_servant)
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False), 
     navbar, 
     dbc.Container(id='page-content', className='mt-4'),
     # Storage in a hidden div
-    html.Div(id='servant-storage', children=placeholder_children, style={'display': 'none'}),
-    html.Div(id='final-table-storage', style={'display': 'none'}),
+    dcc.Store(id='servant-storage', data=placeholder_servant),
+    dcc.Store(id='final-table-storage'),
     html.Div(id='placeholder', style={'display': 'none'}),
     html.Hr(), 
     footer
@@ -95,6 +95,8 @@ def display_page(pathname):
         return mats_needed_layout
     elif pathname == '/mats-csv':
         return mats_csv_layout
+    elif pathname == '/servants-csv':
+        return servants_csv_layout
     else:
         return dcc.Markdown('## Page not found')
 

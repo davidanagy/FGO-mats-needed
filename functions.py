@@ -33,7 +33,7 @@ def set_mats_data(df, asc_level, skill_levels):
             i = 'Max'
         asc_col_clear.append(f'Asc{i}')
     for col in asc_col_clear:
-        df2[col] = [0] * df.shape[0]
+        df[col] = [0] * df.shape[0]
     for i in range(2, 11):
         col_name = f'Skl{i}'
         mult = 0
