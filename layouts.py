@@ -101,6 +101,10 @@ mats_needed_layout = column4
 
 ### Mats CSV layout
 
-column5 = dbc.Col([], id='mats-csv-text')
+column5 = dbc.Col(
+    [
+        html.P(id='mats-csv-text')
+    ]
+)
 
 mats_csv_layout = column5

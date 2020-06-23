@@ -152,7 +152,11 @@ def make_html_csv(pathname, table):
     if pathname == '/mats-csv':
         # https://stackoverflow.com/questions/1776066/python-3-write-newlines-to-html
         csv = pd.read_json(table).to_csv(index=False).split('\r\n')
-        return [html.P(line) for line in csv]
+        output = []
+        for line in csv:
+            output.append(line)
+            output.append(html.Br())
+        return output
 
 # @app.callback(
 #     Output('servant-display-2', 'children'),
