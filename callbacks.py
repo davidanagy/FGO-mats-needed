@@ -26,9 +26,46 @@ def update_options(search_value):
         raise PreventUpdate
     return [o for o in options if search_value.lower() in o['value'].lower()]
 
+"""PROBLEM: Only one callback per output"""
+# @app.callback(
+#     [Output('servant-storage', 'data'),
+#      Output('servant-display', 'children')],
+#     [Input('upload-data', 'contents')],
+#     [State('servant-storage', 'data'),
+#      State('servant-display', 'children')]
+# )
+# def upload_servants(contents, storage, display):
+#     if contents:
+#         try:
+#             df = pd.read_csv(contents)
+#             new_storage = []
+#             new_display = []
+#             pri_dict = {
+#                 1: 'Max everything',
+#                 2: 'Skills to 6/6/6',
+#                 3: "Don't upgrade"
+#             }
+            
+#             for i in range(len(df)):
+#                 skills = list(df.loc[i, 'skills'])
+#                 name = df.loc[i, 'name']
+#                 asc = df.loc[i, 'ascension']
+#                 pri = df.loc[i, 'priority']
+
+#                 servant = {'name': name, 'ascension': asc, 'skills': skills, 'priority': pri}
+#                 new_servants.append(servant)
+
+#                 s = f'{name}: Asc {asc}; Skills {skills[0]},{skills[1]},{skills[2]}; {pri_dict[pri]}'
+#                 new_item = dbc.ListGroupItem(id=name, children=s)
+#                 new_display.append(new_item)
+
+#             return new_storage, new_display
+#         except:
+#             return storage, display
+
 
 @app.callback(
-    [Output('servant-storage', 'children'),
+    [Output('servant-storage', 'data'),
      Output('servant-display', 'children')],
     [Input('submit-servant-button', 'n_clicks')],
     [State('servant-selector', 'value'),
@@ -37,14 +74,14 @@ def update_options(search_value):
      State('skill-selector-2', 'value'),
      State('skill-selector-3', 'value'),
      State('priority-selector', 'value'),
-     State('servant-storage', 'children'),
+     State('servant-storage', 'data'),
      State('servant-display', 'children')]
 )
 def append_selected_servant(n_clicks, name, asc, skl1, skl2, skl3, priority, storage, display):
     if n_clicks == 0:
         return storage, display
     servant = {'name': name, 'ascension': asc, 'skills': [skl1, skl2, skl3], 'priority': priority}
-    storage = json.loads(storage)
+
     for servant2 in storage:
         if servant['name'] == servant2['name']:
             storage.remove(servant2)
@@ -65,7 +102,7 @@ def append_selected_servant(n_clicks, name, asc, skl1, skl2, skl3, priority, sto
             #print(item)
     new_item = dbc.ListGroupItem(id=servant['name'], children=s, active=True)
     display.append(new_item)
-    return json.dumps(storage), display
+    return storage, display
 
 
 with open('mat_names.txt') as f:
@@ -74,13 +111,13 @@ mat_names = mat_names_file.split('\n')[:-1]
 Servant = namedtuple('Servant', ['name', 'ascension', 'skills', 'priority'])
 Material = namedtuple('Material', ['name', 'amount'])
 
-make_final_table_states = [State('servant-storage', 'children'), State('url', 'pathname')]
+make_final_table_states = [State('servant-storage', 'data'), State('url', 'pathname')]
 for name in mat_names:
     make_final_table_states.append(State(f'have-input-{name}', 'value'))
 
 
 @app.callback(
-    [Output('final-table-storage', 'children'),
+    [Output('final-table-storage', 'data'),
      Output('url', 'pathname')],
     [Input('get-final-table', 'n_clicks')],
     make_final_table_states
@@ -95,18 +132,18 @@ def make_final_table_json(n_clicks, servant_data, pathname, *args):
             mat = Material(name, amount)
             mats.append(mat)
 
-        data = json.loads(servant_data)
+        #data = json.loads(servant_data)
         #print(data)
         #print(type(data))
 
-        servants_df = make_servants_table(data)
+        servants_df = make_servants_table(servant_data)
         #print('After make_servants_table:')
         #print(servants_df)
         df = calculate_mats(servants_df, mats)
         # print('After calculate_mats:')
         # print(df)
 
-        return df.to_json(), '/mats-needed-table'
+        return df.to_dict('list'), '/mats-needed-table'
     else:
         return None, pathname
 
@@ -114,11 +151,13 @@ def make_final_table_json(n_clicks, servant_data, pathname, *args):
 @app.callback(
     Output('final-table', 'children'),
     [Input('url', 'pathname'),
-     Input('final-table-storage', 'children')]
+     Input('final-table-storage', 'data')]
 )
-def construct_final_table(pathname, table_json):
+def construct_final_table(pathname, table):
     if pathname == '/mats-needed-table':
-        df = pd.read_json(table_json)
+        print(table)
+
+        df = pd.DataFrame(data=table)
 
         cols = df.columns.tolist()
 
@@ -146,12 +185,28 @@ def construct_final_table(pathname, table_json):
 @app.callback(
     Output('mats-csv-text', 'children'),
     [Input('url', 'pathname')],
-    [State('final-table-storage', 'children')]
+    [State('final-table-storage', 'data')]
 )
-def make_html_csv(pathname, table):
+def make_html_mats_csv(pathname, table):
     if pathname == '/mats-csv':
         # https://stackoverflow.com/questions/1776066/python-3-write-newlines-to-html
-        csv = pd.read_json(table).to_csv(index=False).split('\r\n')
+        csv = pd.DataFrame(data=table).to_csv(index=False).split('\r\n')
+        output = []
+        for line in csv:
+            output.append(line)
+            output.append(html.Br())
+        return output
+
+
+@app.callback(
+    Output('servants-csv-text', 'children'),
+    [Input('url', 'pathname')],
+    [State('servant-storage', 'data')]
+)
+def make_html_csv(pathname, table):
+    if pathname == '/servants-csv':
+        # https://stackoverflow.com/questions/1776066/python-3-write-newlines-to-html
+        csv = pd.DataFrame(data=table).to_csv(index=False).split('\r\n')
         output = []
         for line in csv:
             output.append(line)
