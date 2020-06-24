@@ -1,9 +1,12 @@
+import base64
 import dash
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 import json
+import io
 import os
 import pandas as pd
+import traceback
 from collections import namedtuple
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
@@ -34,40 +37,47 @@ def update_options(search_value):
 #     [State('servant-storage', 'data'),
 #      State('servant-display', 'children')]
 # )
-# def upload_servants(contents, storage, display):
-#     if contents:
-#         try:
-#             df = pd.read_csv(contents)
-#             new_storage = []
-#             new_display = []
-#             pri_dict = {
-#                 1: 'Max everything',
-#                 2: 'Skills to 6/6/6',
-#                 3: "Don't upgrade"
-#             }
-            
-#             for i in range(len(df)):
-#                 skills = list(df.loc[i, 'skills'])
-#                 name = df.loc[i, 'name']
-#                 asc = df.loc[i, 'ascension']
-#                 pri = df.loc[i, 'priority']
+def process_servants_csv(contents, filename, pri_dict, storage):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    try:
+        if 'csv' in filename:
+            df = pd.read_csv(
+                io.StringIO(decoded.decode('utf-8'))
+            )
+        elif 'xls' in filename:
+            df = pd.read_excel(io.BytesIO(decoded))
+        else:
+            return storage, 'Incorrect file type'
 
-#                 servant = {'name': name, 'ascension': asc, 'skills': skills, 'priority': pri}
-#                 new_servants.append(servant)
+        new_storage = []
+        new_display = []
+        
+        for i in range(len(df)):
+            skills = json.loads(df.loc[i, 'skills'])
+            name = df.loc[i, 'name']
+            asc = df.loc[i, 'ascension']
+            pri = df.loc[i, 'priority']
 
-#                 s = f'{name}: Asc {asc}; Skills {skills[0]},{skills[1]},{skills[2]}; {pri_dict[pri]}'
-#                 new_item = dbc.ListGroupItem(id=name, children=s)
-#                 new_display.append(new_item)
+            servant = {'name': name, 'ascension': asc, 'skills': skills, 'priority': pri}
+            new_storage.append(servant)
 
-#             return new_storage, new_display
-#         except:
-#             return storage, display
+            s = f'{name}: Asc {asc}; Skills {skills[0]},{skills[1]},{skills[2]}; {pri_dict[pri]}'
+            new_item = dbc.ListGroupItem(id=name, children=s)
+            new_display.append(new_item)
+
+        return new_storage, new_display
+    except Exception:
+        # https://stackoverflow.com/questions/3702675/how-to-print-the-full-traceback-without-halting-the-program
+        print(traceback.format_exc())
+        return storage, 'File incorrectly formatted'
 
 
 @app.callback(
     [Output('servant-storage', 'data'),
      Output('servant-display', 'children')],
-    [Input('submit-servant-button', 'n_clicks')],
+    [Input('submit-servant-button', 'n_clicks'),
+     Input('upload-data', 'contents')],
     [State('servant-selector', 'value'),
      State('ascension-selector', 'value'),
      State('skill-selector-1', 'value'),
@@ -75,13 +85,23 @@ def update_options(search_value):
      State('skill-selector-3', 'value'),
      State('priority-selector', 'value'),
      State('servant-storage', 'data'),
-     State('servant-display', 'children')]
+     State('servant-display', 'children'),
+     State('upload-data', 'filename')]
 )
-def append_selected_servant(n_clicks, name, asc, skl1, skl2, skl3, priority, storage, display):
-    if n_clicks == 0:
-        return storage, display
-    servant = {'name': name, 'ascension': asc, 'skills': [skl1, skl2, skl3], 'priority': priority}
+def append_selected_servant(n_clicks, contents, name, asc, skl1, skl2, skl3,
+                            priority, storage, display, filename):
+    pri_dict = {
+        1: 'Max everything',
+        2: 'Skills to 6/6/6',
+        3: "Don't upgrade"
+    }
+    if contents:
+        return process_servants_csv(contents, filename, pri_dict, storage)
 
+    elif n_clicks == 0:
+        return storage, display
+
+    servant = {'name': name, 'ascension': asc, 'skills': [skl1, skl2, skl3], 'priority': priority}
     for servant2 in storage:
         if servant['name'] == servant2['name']:
             storage.remove(servant2)
@@ -103,6 +123,15 @@ def append_selected_servant(n_clicks, name, asc, skl1, skl2, skl3, priority, sto
     new_item = dbc.ListGroupItem(id=servant['name'], children=s, active=True)
     display.append(new_item)
     return storage, display
+
+
+# @app.callback(
+#     Output('url', 'pathname'),
+#     [Input('goto-mats', 'submit_n_clicks')]
+# )
+# def goto_mats(submit_n_clicks):
+#     if submit_n_clicks:
+#         return '/mats'
 
 
 with open('mat_names.txt') as f:
@@ -155,9 +184,11 @@ def make_final_table_json(n_clicks, servant_data, pathname, *args):
 )
 def construct_final_table(pathname, table):
     if pathname == '/mats-needed-table':
-        print(table)
+        #print(table)
 
         df = pd.DataFrame(data=table)
+
+        #print(df)
 
         cols = df.columns.tolist()
 

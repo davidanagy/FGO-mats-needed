@@ -68,8 +68,8 @@ external_stylesheets = [
 # Plotly Dash User Guide, URL Routing and Multiple Apps
 # https://dash.plot.ly/urls
 
-placeholder_servant = [{'name': 'placeholder', 'ascension': 0,
-                        'skills': [0,0,0], 'priority': 0}]
+# placeholder_servant = [{'name': 'placeholder', 'ascension': 0,
+#                         'skills': [0,0,0], 'priority': 0}]
 # placeholder_children = json.dumps(placeholder_servant)
 
 app.layout = html.Div([
@@ -77,7 +77,7 @@ app.layout = html.Div([
     navbar, 
     dbc.Container(id='page-content', className='mt-4'),
     # Storage in a hidden div
-    dcc.Store(id='servant-storage', data=placeholder_servant),
+    dcc.Store(id='servant-storage', data=[]),
     dcc.Store(id='final-table-storage'),
     html.Div(id='placeholder', style={'display': 'none'}),
     html.Hr(), 

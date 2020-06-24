@@ -41,6 +41,17 @@ column1 = dbc.Col(
         dcc.Link(dbc.Button('Click here when finished',
                             id='goto-mats', n_clicks=0, color='primary'),
                  href='/mats'),
+        # dcc.ConfirmDialogProvider(
+        #     children=dcc.Link(
+        #         dbc.Button(
+        #             'Click here when finished',
+        #             color='primary'
+        #         ),
+        #         href='/mats'
+        #     ),
+        #     id='goto-mats',
+        #     message='Are you finished entering your Servants?'
+        # )
     ]
 )
 
