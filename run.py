@@ -1,3 +1,5 @@
+"""Launch the app"""
+
 # Imports from 3rd party libraries
 import dash
 import dash_bootstrap_components as dbc

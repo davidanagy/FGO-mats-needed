@@ -1,3 +1,5 @@
+"""Define the app"""
+
 import dash
 import dash_bootstrap_components as dbc
 # from flask_caching import Cache
