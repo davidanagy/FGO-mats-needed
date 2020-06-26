@@ -226,6 +226,7 @@ def make_html_mats_csv(pathname, table):
         for line in csv:
             output.append(line)
             output.append(html.Br())
+        print(output)
         return output
 
 
