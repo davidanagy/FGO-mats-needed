@@ -15,7 +15,6 @@ meta_tags=[
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, meta_tags=meta_tags)
 app.config.suppress_callback_exceptions = True
 app.title = 'FGO Mats Needed' # appears in browser title bar
-server = app.server
 
 # https://dash.plotly.com/sharing-data-between-callbacks PART 4
 # cache = Cache(app.server, config={
