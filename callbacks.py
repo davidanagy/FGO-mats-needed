@@ -223,6 +223,7 @@ def make_html_mats_csv(pathname, table):
     if pathname == '/mats-csv':
         
         # https://stackoverflow.com/questions/1776066/python-3-write-newlines-to-html
+
         df = pd.DataFrame(data=table)
         csv = df.to_csv(index=False)
 
@@ -260,7 +261,11 @@ def make_html_mats_csv(pathname, table):
 def make_html_csv(pathname, table):
     if pathname == '/servants-csv':
         # https://stackoverflow.com/questions/1776066/python-3-write-newlines-to-html
-        csv = pd.DataFrame(data=table).to_csv(index=False).split('\r\n')
+        csv = pd.DataFrame(data=table).to_csv(index=False)
+        if '\r\n' in csv:
+            csv = csv.split('\r\n')
+        else:
+            csv = csv.split('\n')
         output = []
         for line in csv:
             output.append(line)
