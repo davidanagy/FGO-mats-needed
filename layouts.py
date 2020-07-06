@@ -50,7 +50,7 @@ column1 = dbc.Col(
         dcc.Dropdown(id='servant-selector', placeholder='Search for your Servant'),
         dcc.Dropdown(id='ascension-selector', options=asc_options,
                      placeholder='Select ascension level', searchable=False),
-        dcc.Markdown('Input skill levels:'),
+        dcc.Markdown("Input Servant's current skill levels:"),
         dcc.Input(id='skill-selector-1', type='number', placeholder='Skill 1',
                   min=1, max=10, step=1),
         dcc.Input(id='skill-selector-2', type='number', placeholder='Skill 2',
