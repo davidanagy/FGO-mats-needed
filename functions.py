@@ -123,6 +123,67 @@ def calculate_mats(df, mats):
     return mats_df
 
 
+def calculate_mats_new(df, mats):
+    mat_cols = df.columns.tolist()
+    for col in ['Name', 'Material', 'Goals']:
+        mat_cols.remove(col)
+    df = df.rename(cols={'AscMax': 'Asc5'})
+    for i in range(len(df)):
+        need_amount = 0
+        want_amount = 0
+        name = df.loc[i, 'Name']
+        mat = df.loc[i, 'Material']
+        goals = df.loc[i, 'Goals']
+        asc_goal = goals[0]
+        skl_goals = goals[1]
+
+        for col in mat_cols:
+            if col[0:3] == 'Asc':
+                if int(col[3]) <= asc_goal:
+                    need_amount += df.loc[i, col]
+                else:
+                    want_amount += df.loc[i, col]
+
+            elif col[0:3] == 'Skl':
+                total = df.loc[i, col]
+                per_skill = total // 3
+                mult = 0
+                for goal in skl_goals:
+                    if int(col[3]) <= goal:
+                        mult += 1
+                want_amount += total - per_skill*mult
+                need_amount = total - want_amount
+            else:
+                print(col)
+
+
+        if mat in mats_df.index:
+            mats_df.loc[mat, 'Need'] += need_amount
+            mats_df.loc[mat, 'Want'] += want_amount
+        else:
+            mats_df.loc[mat, 'Need'] = need_amount
+            mats_df.loc[mat, 'Want'] = want_amount
+            mats_df = mats_df.fillna(0)
+
+    for mat in mats:
+        mats_df.loc[mat.name, 'Have'] = mat.amount
+
+    mats_df['Need_Diff'] = mats_df['Need'] - mats_df['Have']
+    mats_df['Want_Diff'] = mats_df['Want'] - mats_df['Have']
+
+    mats_df = mats_df.fillna(0)
+
+    mats_df = mats_df.astype('int32')
+
+    mats_df = mats_df.reset_index()
+    mats_df = mats_df.rename(columns={'index': 'Material'})
+
+    mats_df = mats_df.sort_values(by='Need_Diff', ascending=False)
+    mats_df = mats_df.reset_index(drop=True)
+
+    return mats_df
+
+
 # mat_names = scrape_mat_names()
 
 # with open('mat_names.txt', 'w') as f:

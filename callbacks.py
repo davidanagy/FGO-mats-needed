@@ -10,6 +10,7 @@ import traceback
 from collections import namedtuple
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
+from flask import send_file
 
 from app import app
 from functions import make_servants_table, calculate_mats
@@ -220,8 +221,27 @@ def construct_final_table(pathname, table):
 )
 def make_html_mats_csv(pathname, table):
     if pathname == '/mats-csv':
+        
         # https://stackoverflow.com/questions/1776066/python-3-write-newlines-to-html
-        csv = pd.DataFrame(data=table).to_csv(index=False)
+
+        df = pd.DataFrame(data=table)
+        csv = df.to_csv(index=False)
+
+        # print('begin download')
+        # proxyIO = io.StringIO()
+        # df.to_csv(proxyIO, index=False, encoding='utf-8')
+        # mem = io.BytesIO()
+        # mem.write(proxyIO.getvalue().encode('utf-8'))
+        # mem.seek(0)
+        # send_file(
+        #     mem,
+        #     mimetype='text/csv',
+        #     attachment_filename='mats-needed.csv',
+        #     as_attachment=True,
+        #     cache_timeout=0
+        # )
+        # print('end download')
+
         if '\r\n' in csv:
             csv = csv.split('\r\n')
         else:
