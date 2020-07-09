@@ -12,7 +12,7 @@ import io
 import pandas as pd
 
 # Imports from this application
-from app import app, server
+from app import app
 import callbacks
 from layouts import index_layout, mats_layout, mats_needed_layout, mats_csv_layout, servants_csv_layout
 
@@ -31,6 +31,8 @@ dark (boolean, optional): Applies the `navbar-dark` class to the NavbarSimple, c
 light (boolean, optional): Applies the `navbar-light` class to the NavbarSimple, causing text in the children of the Navbar to use dark colors for contrast / visibility.
 sticky (string, optional): Stick the navbar to the top or the bottom of the viewport, options: top, bottom. With `sticky`, the navbar remains in the viewport when you scroll. By contrast, with `fixed`, the navbar will remain at the top or bottom of the page.
 """
+
+server = app.server
 
 navbar = dbc.NavbarSimple(
     brand="FGO Mats Needed",
