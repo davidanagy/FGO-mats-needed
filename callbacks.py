@@ -223,7 +223,6 @@ def make_html_mats_csv(pathname, table):
     if pathname == '/mats-csv':
         
         # https://stackoverflow.com/questions/1776066/python-3-write-newlines-to-html
-
         df = pd.DataFrame(data=table)
         csv = df.to_csv(index=False)
 
